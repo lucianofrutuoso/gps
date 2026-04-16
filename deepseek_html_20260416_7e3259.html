@@ -1,0 +1,27 @@
+<!-- Página web servida pelo próprio ESP8266 -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GPS Tracker</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+</head>
+<body>
+    <div id="map" style="height: 500px;"></div>
+    <div id="coords">Lat: --, Lon: --</div>
+    
+    <script>
+        // O ESP8266 serve esta página e atualiza via WebSocket
+        var map = L.map('map').setView([-15.79, -47.88], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        
+        // Conecta ao WebSocket do ESP8266
+        var ws = new WebSocket('ws://' + location.host + '/ws');
+        ws.onmessage = function(event) {
+            var data = JSON.parse(event.data);
+            L.marker([data.lat, data.lon]).addTo(map);
+            document.getElementById('coords').innerHTML = 
+                'Lat: ' + data.lat + ', Lon: ' + data.lon;
+        };
+    </script>
+</body>
+</html>
